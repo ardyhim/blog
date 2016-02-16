@@ -1,0 +1,167 @@
+<%- include('header') -%>
+<div class="col-lg-10 content">
+  <div class="form_post">
+    <form id="formPosting">
+      <fieldset class="form-group">
+        <label for="title">Title</label>
+        <input type="text" class="form-control" id="title_input" placeholder="Enter Title">
+      </fieldset>
+      <fieldset class="form-group">
+        <label for="body">Category</label>
+        <% category.forEach(function(category){ %>
+          <!-- <a class="ctg-tag" href="#"><%= category.category %></a> -->
+          <label class="c-input c-checkbox">
+            <input type="checkbox" class="ctg-tag" value="<%= category.category %>">
+            <span class="c-indicator"></span>
+            <%= category.category %>
+          </label>
+        <% }); %>
+        <input id="ctg-tag" class="form-control" type="text" name="name" value="">
+        <input id="input_video" type="hidden" name="name" value="">
+        <input id="input_poster" type="hidden" name="name" value="">
+        <input id="input_subtitle" type="hidden" name="name" value="">
+      </fieldset>
+      <fieldset class="form-group">
+        <label for="body">Body text</label>
+        <textarea class="form-control" id="body_input" rows="3"></textarea>
+      </fieldset>
+      <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-submit">Submit</button>
+    </form>
+    <fieldset class="form-group">
+      <div class="col-lg-4">
+        <form id="formFilm" method="post" enctype="multipart/form-data">
+          <label for="video">File input Video</label>
+          <input class="form-control-file" name="film" type="file" />
+          <button class="btn btn-primary btn-upload" id="btnVideo">Submit</button>
+        </form>
+      </div>
+      <div class="col-lg-4">
+        <form id="formPoster" method="post" enctype="multipart/form-data">
+          <label for="poster">File input Poster</label>
+          <input class="form-control-file" name="film" type="file" />
+          <button class="btn btn-primary btn-upload" id="btnPoster">Submit</button>
+        </form>
+      </div>
+      <div class="col-lg-4">
+        <form id="formSubtitle" method="post" enctype="multipart/form-data">
+          <label for="subtitle">File input Subtitle</label>
+          <input class="form-control-file" name="film" type="file" />
+          <button class="btn btn-primary btn-upload" id="btnSubtitle">Submit</button>
+        </form>
+      </div>
+      <progress class="progress progress-striped" value="0" max="100"></progress>
+    </fieldset>
+  </div>
+</div>
+<script type="text/javascript">
+  var socket = io.connect();
+  socket.on('upload', function(data){
+    var percent = data.bytesReceived / data.bytesExpected * 100;
+    $('.progress').val(percent);
+  });
+
+  $(document).ready(function() {
+
+    $('#btnPoster').prop('disabled', true);
+    $('#btnSubtitle').prop('disabled', true);
+    $('#btn-submit').prop('disabled', true);
+    $('#btn-submit').click(function() {
+      var tag = $('#ctg-tag').val().replace(',','');
+      var data = {
+        title : $('#title_input').val(),
+        body  : $('#body_input').val(),
+        category : tag,
+        poster  : $('#input_poster').val(),
+        video   : $('#input_video').val(),
+        subtitle: $('#input_subtitle').val()
+      };
+      $.ajax({
+        url: '/admin/posting',
+        type: 'POST',
+        data: data,
+      })
+      .done(function(data) {
+        if (data.message == 'succes') {
+          location.reload();
+        }
+      })
+      .fail(function() {
+        console.log("error");
+      })
+    }); // end formPosting
+
+    $("#formFilm").submit(function(){
+        $('.progress').val('0');
+        var formData = new FormData($(this)[0]);
+        $.ajax({
+            url: '/admin/upload',
+            type: 'POST',
+            data: formData,
+            async: false,
+            success: function (data) {
+                $('#input_video').val(data.file.name);
+                $('#btnVideo').prop('disabled', true);
+                $('#btnPoster').prop('disabled', false);
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+        return false;
+    }); // end formFilm
+
+    $("#formPoster").submit(function(){
+        var formData = new FormData($(this)[0]);
+        $('.progress').val('0');
+        $.ajax({
+            url: '/admin/upload',
+            type: 'POST',
+            data: formData,
+            async: false,
+            success: function (data) {
+                $('#input_poster').val(data.file.name);
+                $('#btnSubtitle').prop('disabled', false);
+                $('#btnPoster').prop('disabled', true);
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+        return false;
+    }); // end formPoster
+
+    $("#formSubtitle").submit(function(){
+        var formData = new FormData($(this)[0]);
+        $('.progress').val('0');
+        $.ajax({
+            url: '/admin/upload',
+            type: 'POST',
+            data: formData,
+            async: false,
+            success: function (data) {
+                $('#input_subtitle').val(data.file.name);
+                $('#btnSubtitle').prop('disabled', true);
+                $('#btn-submit').prop('disabled', false);
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+        return false;
+    }); // end formSubtitle
+
+    $('.ctg-tag').change(function() {
+      if ($(this).is(':checked')) {
+        var ctg_chek = $(this).val();
+        $('#ctg-tag').val($('#ctg-tag').val()+','+ctg_chek);
+      } else {
+        var ctg_chek = $(this).val();
+        var ctg_ipt = $('#ctg-tag').val();
+        ctg_ipt = ctg_ipt.replace(','+ctg_chek,'');
+        $('#ctg-tag').val(ctg_ipt);
+      }
+    }); // end ctg-tag
+
+  }); // end document
+</script>
+<%- include('footer') -%>

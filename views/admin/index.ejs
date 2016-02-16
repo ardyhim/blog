@@ -1,0 +1,111 @@
+      <%- include('header') -%>
+      <div class="col-lg-10 content">
+        <div class="daftar_post">
+          <table id="tablePost" class="table">
+            <thead class="thead-inverse">
+              <tr>
+                <th>title</th>
+                <th>video</th>
+                <th>poster</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% data.forEach(function(data){ %>
+              <tr>
+                <td><%= data.title %></td>
+                <% data.file.forEach(function(data){ %>
+                <td><button id="<%= data.video %>,<%= data.subtitle %>" class="btn btn-info btn-video" data-toggle="modal" data-target=".bd-video-modal-lg"><i class="fa fa-file-video-o"></i></button></td>
+                <td><button id="<%= data.poster %>" class="btn btn-info btn-image" data-toggle="modal" data-target=".bd-image-modal-lg"><i class="fa fa-file-image-o"></i></button></td>
+                <% }) %>
+                <td>
+                  <button id="<%= data._id %>" data-target=".bd-example-modal-lg" title="Edit Article" type="button" class="btn btn-primary btn-edit" name="button"><i class="fa fa-edit"></i></button>
+                  <button id="<%= data._id %>" title="Hapus Article" type="button" class="btn btn-danger btn-hapus" name="button"><i class="fa fa-times"></i></button>
+                </td>
+              </tr>
+              <%}) %>
+            </tbody>
+          </table>
+          <nav>
+            <ul class="pager">
+              <li class="pager-prev"><a href="#">Previous</a></li>
+              <li class="pager-next"><a href="#">Next</a></li>
+            </ul>
+          </nav>
+        </div>
+        <!-- MODAL -->
+        <div class="modal fade bd-video-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3>Video</h3>
+              </div>
+              <div class="modal-body">
+                <video id="modal-video" class="embed-responsive-item video-js vjs-default-skin" controls preload="none" data-setup="{}">
+                  <source src="" type="video/mp4">
+                  <track kind="subtitles" src="../shared/example-captions.vtt" srclang="en" label="English"></track>
+                  <!-- Tracks need an ending tag thanks to IE9 -->
+                </video>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade bd-image-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3>Image</h3>
+              </div>
+              <div class="modal-body">
+                <img id="modal-image" src="" class="img-fluid" alt="Responsive image">
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- END MODAL -->
+        <script type="text/javascript">
+
+
+
+          $(document).ready(function() {
+            $('#tablePost').on('click', '.btn-hapus', function(event) {
+              var id = $(this).attr('id');
+              console.log(id);
+              $.ajax({
+                url: '/admin/posting/'+id,
+                type: 'DELETE'
+              })
+              .done(function(data) {
+                console.log("success");
+                if (data.message == 'succes to remove posting') {
+                  location.reload();
+                }
+              })
+              .fail(function() {
+                console.log("error");
+              })
+              .always(function() {
+                console.log("complete");
+              });
+
+            });
+            $('.btn-video').click(function() {
+              var id = $(this).attr('id').split(',');
+              console.log(id);
+              var src = '/file/film/' + id[0];
+              console.log(src);
+              $('source').attr("src", src)
+              $('track').attr('src', '/file/film/'+id[1]);
+              $('#modal-video').get(0).load();
+               //$('#'+videoID).attr('poster', newposter); //Change video poster
+              $('#modal-video').get(0).play();
+            });
+
+            $('.btn-image').click(function() {
+              var src = '/file/poster/' + $(this).attr('id');
+              $('#modal-image').attr('src', src);
+            });
+          });
+        </script>
+      </div>
+      <%- include('footer') -%>

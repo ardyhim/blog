@@ -1,0 +1,27 @@
+<%- include('header') -%>
+        <div class="content">
+          <div class="col-lg-6 article">
+            <% data.forEach(function(data){ %>
+            <div class="post">
+              <div class="col-lg-5">
+                <div class="post-thumbnail">
+                  <% data.file.forEach(function(file){ %>
+                    <img src="/file/poster/<%= file.poster %>" alt="" />
+                  <% }) %>
+                </div>
+                <% data.category.forEach(function(category){ %>
+                  <a class="ctg-info" href="#"><%= category %></a>
+                <% }); %>
+              </div>
+              <div class="col-lg-5">
+                <a href="/movie/post/<%= data._id %>"><%= data.title %></a>
+                <p>
+                  <%= data.body %>
+                </p>
+              </div>
+            </div>
+          <% }); %>
+          </div>
+          <%- include('sidebar') -%>
+        </div>
+<%- include('footer') -%>

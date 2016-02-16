@@ -1,0 +1,57 @@
+<%- include('header') -%>
+<div class="content">
+  <div class="col-lg-6 article">
+    <div class="post">
+      <% data.forEach(function(data){ %>
+      <div class="embed-responsive embed-responsive-16by9">
+        <% data.file.forEach(function(file){ %>
+        <video id="video" class="embed-responsive-item video-js vjs-default-skin" controls preload="none" poster="/file/poster/<%= file.poster %>" data-setup="{}">
+          <source src="/file/film/<%= file.video %>" type="video/mp4">
+          <!-- <track kind="subtitles" src="/file/film/<%= file.subtitle %>" srclang="en" label="English"></track> -->
+          <track kind="captions" src="/file/film/creed-(2015)-bluray-720p.vtt" srclang="id" label="Indonesia" default></track>
+          <!-- Tracks need an ending tag thanks to IE9 -->
+        </video>
+        <!-- <div class="srt" data-video="video" data-srt="/file/film/<%= file.subtitle %>"></div> -->
+        <%}) %>
+      </div>
+      <div class="meta-info">
+        <% data.category.forEach(function(category){ %>
+          <a class="ctg-info" href="#"><%= category %></a>
+        <% }); %>
+      </div>
+      <div class="post-text">
+        <%= data.body %>
+      </div>
+      <%}) %>
+      <div class="post-related">
+        <h3>Related Posts</h3>
+        <div class="col-lg-3">
+          <a href="#">
+            <img src="/uploads/altynbekova-sabina.jpg" alt="" />
+            <div class="related-text">
+              SABINA
+            </div>
+          </a>
+        </div>
+        <div class="col-lg-3">
+          <a href="#" title="The Last Witch Hunter (2015)">
+            <img src="/uploads/332922-pierrot-sad-mime-mask.jpg" alt="" />
+            <div class="related-text">
+              The Last Witch Hunter (2015)
+            </div>
+          </a>
+        </div>
+        <div class="col-lg-3">
+          <a href="#" title="Steve Job (2015)">
+            <img src="/uploads/2014-04-Barcelona-Logo-3.jpg" alt="" />
+            <div class="related-text">
+              Steve Job (2015)
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <%- include('sidebar') -%>
+</div>
+<%- include('footer') -%>
